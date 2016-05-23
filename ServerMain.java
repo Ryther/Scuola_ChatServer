@@ -32,10 +32,7 @@ public class ServerMain {
         socketHandler.accept();
         streamHandler = new StreamHandler(socketHandler.getSocket());
         streamHandler.init();
-//        chatMessage = new ChatMessage("Ryther");
-//        chatMessage.setMessage("Messaggio di prova");
-//        chatMessage.setDate();
         chatMessage = (ChatMessage) streamHandler.pullFromStream();
-        System.out.println(chatMessage.getMessage());
+        System.out.println(chatMessage.getDate() + " - [" + chatMessage.getUsername() + "] " + chatMessage.getMessage());
     }
 }
