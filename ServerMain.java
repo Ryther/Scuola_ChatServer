@@ -31,6 +31,7 @@ public class ServerMain {
         socketHandler = new SocketHandler(Consts.PORT);
         socketHandler.accept();
         streamHandler = new StreamHandler(socketHandler.getSocket());
+        streamHandler.init();
 //        chatMessage = new ChatMessage("Ryther");
 //        chatMessage.setMessage("Messaggio di prova");
 //        chatMessage.setDate();
