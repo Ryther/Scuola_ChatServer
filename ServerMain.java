@@ -36,5 +36,6 @@ public class ServerMain {
 //        chatMessage.setMessage("Messaggio di prova");
 //        chatMessage.setDate();
         chatMessage = (ChatMessage) streamHandler.pullFromStream();
+        System.out.println(chatMessage.getMessage());
     }
 }
