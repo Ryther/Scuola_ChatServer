@@ -1,9 +1,5 @@
-package server;
-
-import utils.ChatMessage;
-import utils.Consts;
-import utils.SocketHandler;
-import utils.StreamHandler;
+import net.SocketHandler;
+import net.StreamHandler;
 
 /**
  *
