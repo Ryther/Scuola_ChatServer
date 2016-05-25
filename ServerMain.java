@@ -1,3 +1,5 @@
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import net.SocketHandler;
 import net.StreamHandler;
 
@@ -13,11 +15,15 @@ public class ServerMain {
     
     public static void main(String[] args) {
         
+        chatMessage = new ChatMessage("Berta");
         socketHandler = new SocketHandler(Consts.PORT);
         socketHandler.accept();
         streamHandler = new StreamHandler(socketHandler.getSocket());
         streamHandler.init();
-        chatMessage = (ChatMessage) streamHandler.pullFromStream();
-        System.out.println(chatMessage.getDate() + " - [" + chatMessage.getUsername() + "] " + chatMessage.getMessage());
+        ExecutorService threadPool = Executors.newFixedThreadPool(Consts.TALKER_THREADS);
+        Runnable writingThread = new Talker(streamHandler, chatMessage);
+        Runnable readingThread = new Talker(streamHandler);
+        threadPool.submit(writingThread);
+        threadPool.submit(readingThread);
     }
 }
