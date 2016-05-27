@@ -1,8 +1,9 @@
 package model;
 
-import chatUtils.net.Talker;
+import chatUtils.data.Chat;
 import chatUtils.data.Consts;
-import chatUtils.data.ChatMessage;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import utils.net.SocketHandler;
@@ -15,20 +16,21 @@ import utils.net.StreamHandler;
 public class ServerMain {
 
     private static SocketHandler socketHandler;
-    private static StreamHandler streamHandler;
-    private static ChatMessage chatMessage;
     
     public static void main(String[] args) {
         
-        chatMessage = new ChatMessage("Berta");
+        ExecutorService threadPool = Executors.newFixedThreadPool(Consts.CLIENT_THREADS);
+        
         socketHandler = new SocketHandler(Consts.PORT);
-        socketHandler.accept();
-        streamHandler = new StreamHandler(socketHandler.getSocket());
-        streamHandler.init();
-        ExecutorService threadPool = Executors.newFixedThreadPool(Consts.TALKER_THREADS);
-        Runnable writingThread = new Talker(streamHandler, chatMessage);
-        Runnable readingThread = new Talker(streamHandler);
-        threadPool.submit(writingThread);
-        threadPool.submit(readingThread);
+        Set<Chat> chats = new TreeSet();
+        
+        while (true) {
+            socketHandler.accept();
+
+            Runnable clientManager = new ClientManager(
+                    new StreamHandler(socketHandler.getSocket()), chats);
+
+            threadPool.submit(clientManager);
+        }
     }
 }
