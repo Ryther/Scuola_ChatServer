@@ -24,9 +24,19 @@ public class ServerData {
         this.connectedUsers.put(userData.hashCode(), userData);
     }
     
+    public UserData getUser(String userName) {
+        
+        return this.connectedUsers.get(userName.hashCode());
+    }
+    
     public void addChat(Chat chat) {
         
         this.chats.put(chat.hashCode(), chat);
+    }
+    
+    public Chat getChat(String chatName) {
+        
+        return this.chats.get(chatName.hashCode());
     }
     
     public void addUserToChat(String userName, String chatName) {
@@ -35,5 +45,15 @@ public class ServerData {
                 addUser(this.connectedUsers.get(userName.hashCode()));
         this.connectedUsers.get(userName.hashCode()).
                 addChat(this.chats.get(chatName.hashCode()));
+    }
+    
+    public boolean checkUser(String userName) {
+        
+        return this.connectedUsers.containsKey(userName.hashCode());
+    }
+    
+    public boolean checkChat(String chatName) {
+        
+        return this.chats.containsKey(chatName.hashCode());
     }
 }
