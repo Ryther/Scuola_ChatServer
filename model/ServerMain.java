@@ -19,7 +19,6 @@ public class ServerMain {
     public static void main(String[] args) {
         
         ServerData serverData = new ServerData();
-        serverData.addChat(new Chat("Test"));
         ExecutorService threadPool = Executors.newFixedThreadPool(Consts.CLIENT_THREADS);
         
         socketHandler = new SocketHandler(Consts.PORT);

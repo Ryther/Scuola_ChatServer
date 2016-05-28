@@ -1,11 +1,10 @@
 package model;
 
+import chatUtils.data.Chat;
 import chatUtils.data.ChatMessage;
-import chatUtils.data.Consts;
 import chatUtils.data.UserData;
-import chatUtils.net.Talker;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
+import java.util.List;
 import model.data.ServerData;
 import utils.net.StreamHandler;
 
@@ -30,18 +29,27 @@ public class ClientManager implements Runnable {
         
         UserData userData;
         userData = (UserData) this.streamHandler.pullFromStream();
+        String userName = userData.getUserName();
         serverData.addUser(userData);
-        serverData.addUserToChat(userData.getUserName(), "Test");
+        List<Chat> chats = new ArrayList<Chat>(userData.getChats().values());
+        for (Chat chat:chats) {
+            if (!serverData.checkChat(chat.getChatName())) {
+                
+                serverData.addChat(chat);
+            }
+            serverData.addUserToChat(userData.getUserName(), chat.getChatName());
+        }
+        serverData.getUser(userName).setStreamHandler(streamHandler);
         
+        List<UserData> usersList;
         while (true) {
             
             ChatMessage chatMessage = (ChatMessage) this.streamHandler.pullFromStream();
-            //for (UserData chatUsers:this.serverData.getChat(chatMessage.getChatName()).getUsers().entrySet())
+            usersList = new ArrayList<UserData>(this.serverData.getChat(chatMessage.getChatName()).getUsers().values());
+            for (UserData chatUser:usersList) {
+                
+                chatUser.getStreamHandler().pushToStream(chatMessage);
+            }
         }
-        ExecutorService threadPool = Executors.newFixedThreadPool(Consts.TALKER_THREADS);
-        Runnable writingThread = new Talker(streamHandler, new ChatMessage(this.userData.getUserName()));
-        Runnable readingThread = new Talker(streamHandler);
-        threadPool.submit(writingThread);
-        threadPool.submit(readingThread);
     }
 }
