@@ -1,12 +1,12 @@
 package model;
 
-import chatUtils.data.Chat;
+import chatUtils.data.ChatMessage;
 import chatUtils.data.Consts;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import model.data.ServerData;
+import java.nio.channels.SelectionKey;
+import java.util.Iterator;
+import java.util.Set;
+import utils.net.SocketChannelHandler;
 import utils.net.SocketHandler;
-import utils.net.StreamHandler;
 
 /**
  *
@@ -15,21 +15,47 @@ import utils.net.StreamHandler;
 public class ServerMain {
 
     private static SocketHandler socketHandler;
+    private static SocketChannelHandler socketChannelHandler;
+    
+//    public static void main(String[] args) {
+//        
+//        ServerData serverData = new ServerData();
+//        ExecutorService threadPool = Executors.newFixedThreadPool(Consts.CLIENT_THREADS);
+//        
+//        socketHandler = new SocketHandler(Consts.PORT);
+//        
+//        while (true) {
+//            socketHandler.accept();
+//
+//            Runnable clientManager = new ClientManager(
+//                    new StreamHandler(socketHandler.getSocket()), serverData);
+//
+//            threadPool.submit(clientManager);
+//        }
+//    }
     
     public static void main(String[] args) {
         
-        ServerData serverData = new ServerData();
-        ExecutorService threadPool = Executors.newFixedThreadPool(Consts.CLIENT_THREADS);
-        
-        socketHandler = new SocketHandler(Consts.PORT);
+        socketChannelHandler = new SocketChannelHandler(Consts.PORT);
         
         while (true) {
-            socketHandler.accept();
-
-            Runnable clientManager = new ClientManager(
-                    new StreamHandler(socketHandler.getSocket()), serverData);
-
-            threadPool.submit(clientManager);
+            
+            Set<SelectionKey> keySet = socketChannelHandler.select();
+            Iterator<SelectionKey> selectionKeys = keySet.iterator();
+            
+            while (selectionKeys.hasNext()) {
+                
+                SelectionKey selectedKey = selectionKeys.next();
+                if (selectedKey.isAcceptable()) {
+                    
+                    socketChannelHandler.accept();
+                    
+                } else if (selectedKey.isReadable()) {
+                    
+                    ChatMessage chatMessage = (ChatMessage) socketChannelHandler.pullFromStream(selectedKey);
+                    System.out.println(chatMessage);
+                }
+            }
         }
     }
 }
