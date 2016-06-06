@@ -40,9 +40,9 @@ public class ServerMain {
                     
                     SocketChannelHandler tempSocketChannelHandler;
                     tempSocketChannelHandler = new SocketChannelHandler((SocketChannel) selectedKey.channel());
-                    Runnable clientManager = new ClientManager(tempSocketChannelHandler, 
+                    Runnable clientManager = new ClientManager(selectedKey, 
                             serverData, 
-                            socketChannelHandler.pullFromChannel(selectedKey));
+                            socketChannelHandler.pullFromChannel(selectedKey, Consts.BUFFER_DIMENSION));
                     poolThread.execute(clientManager);
                 }
             }
