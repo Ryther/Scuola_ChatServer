@@ -66,10 +66,6 @@ public class ClientManager implements Runnable {
     
     private void propagateNewUser(UserData userData) {
         
-        ChatMessage chatMessage = new ChatMessage(userData.getUserName() + " si è unito alla chat");
-        chatMessage.setMessage("");
-        chatMessage.setDateTime();
-        
         List<UserData> usersList;
         List<Chat> chats = new ArrayList<Chat>(userData.getChats().values());
         for (Chat chat:chats) {
@@ -77,7 +73,7 @@ public class ClientManager implements Runnable {
             for (UserData chatUser:usersList) {
 
                 SocketChannel socketChannel = (SocketChannel) chatUser.getSelectionKey().channel();
-                SocketChannelHandler.pushToChannel(socketChannel, chatMessage);
+                SocketChannelHandler.pushToChannel(socketChannel, userData);
             }
         }
     }
